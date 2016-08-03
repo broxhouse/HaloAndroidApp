@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">HaloAndroidApp</string>
+    <string name="edit_message">Enter your Gamertag</string>
+    <string name="button_send">Go!</string>
 </resources>

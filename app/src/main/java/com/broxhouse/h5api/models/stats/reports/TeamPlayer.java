@@ -3,7 +3,6 @@
 package com.broxhouse.h5api.models.stats.reports;
 
 import com.broxhouse.h5api.models.stats.common.Player;
-
 import com.google.gson.annotations.SerializedName;
 
 public class TeamPlayer {
@@ -94,5 +93,15 @@ public class TeamPlayer {
 
     public int getTotalAssists() {
         return totalAssists;
+    }
+
+    public void setTotalKills(int kills)
+    {
+        this.totalKills = kills;
+    }
+
+    public void setTotalDeaths(int deaths)
+    {
+        this.totalDeaths = deaths;
     }
 }
