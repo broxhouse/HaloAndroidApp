@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.broxhouse.h5api">
 
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <application
         android:allowBackup="true"
         android:icon="@drawable/champion"
-        android:logo="@drawable/champion_logo"
         android:label="@string/app_name"
+        android:logo="@drawable/champion_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
@@ -26,7 +27,9 @@
         <activity
             android:name=".TestMenu"
             android:label="@string/title_activity_test_menu"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".GetMatchStats" />
+        <activity android:name=".GetMedals"></activity>
     </application>
 
 </manifest>

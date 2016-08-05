@@ -14,6 +14,11 @@ import android.content.res.Resources;
 import android.util.TypedValue;
 import android.util.Log;
 
+import com.broxhouse.h5api.models.metadata.Map;
+import com.broxhouse.h5api.models.metadata.Medal;
+import com.broxhouse.h5api.models.metadata.Weapon;
+
+import org.jdom.Content;
 import org.w3c.dom.Text;
 
 
@@ -23,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "brocksMessage";
     public static String GAMERTAG = null;
+    public static DBHandler dbHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -31,35 +37,53 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.champion);
+        dbHandler  = new DBHandler(this, null, null, 1);
 
-        setContentView(R.layout.activity_main);
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Medal[] medals = HaloApi.getMedals();
+                    for (int i = 0; i < medals.length; i++) {
+                        dbHandler.addMedal(medals[i]);
+                    }
+                    Weapon[] weapons = HaloApi.getWeapons();
+                    for (int i = 0; i < weapons.length; i++) {
+                        dbHandler.addWeapon(weapons[i]);
+                    }
+                    Map[] maps = HaloApi.getMaps();
+                    for (int i = 0; i < maps.length; i++) {
+                        dbHandler.addMap(maps[i]);
+                    }
+                } catch (Exception e) {
+                }
+
+                setContentView(R.layout.activity_main);
+            }
+        });
 
         //creating a button object that references the button we created in XML -- findViewById finds the widget by it's id
-        Button mainButton = (Button) findViewById(R.id.mainButton);
+//        Button mainButton = (Button) findViewById(R.id.mainButton);
 
         //Tells button to wait to be clicked and then tells it what to do when it is clicked
-        mainButton.setOnClickListener(
-                new Button.OnClickListener(){
-                    public void onClick(View v){
-                        TextView mainText = (TextView) findViewById(R.id.mainText);
-                        EditText gtInputMain = (EditText) findViewById(R.id.gtInputMain);
-                        GAMERTAG = gtInputMain.getText().toString();
-                        mainText.setText(GAMERTAG);
-                    }
-                }
-        );
-
-        mainButton.setOnLongClickListener(
-                new Button.OnLongClickListener(){
-                    public boolean onLongClick(View v) {
-                        TextView mainText = (TextView) findViewById(R.id.mainText);
-                        EditText gtInputMain = (EditText) findViewById(R.id.gtInputMain);
-                        GAMERTAG = gtInputMain.getText().toString();
-                        mainText.setText(GAMERTAG);
-                        return true;
-                    }
-                }
-        );
+//        mainButton.setOnClickListener(
+//                new Button.OnClickListener(){
+//                    public void onClick(View v){
+//                        EditText gtInputMain = (EditText) findViewById(R.id.gtInputMain);
+//                        GAMERTAG = gtInputMain.getText().toString();
+//                    }
+//                }
+//        );
+//
+//        mainButton.setOnLongClickListener(
+//                new Button.OnLongClickListener(){
+//                    public boolean onLongClick(View v) {
+//                        EditText gtInputMain = (EditText) findViewById(R.id.gtInputMain);
+//                        GAMERTAG = gtInputMain.getText().toString();
+//                        return true;
+//                    }
+//                }
+//        );
 //        //Creating interface programmatically
 //
 //        //Layout
@@ -109,6 +133,13 @@ public class MainActivity extends AppCompatActivity {
 //
 //        //Setting this activity's content/display to this view
 //        setContentView(brocksLayout);
+    }
+
+    public void onClick(View view){
+        EditText gtInputMain = (EditText) findViewById(R.id.gtInputMain);
+        GAMERTAG = gtInputMain.getText().toString();
+        Intent i = new Intent(this, ChooseOptionsActivity.class);
+        startActivity(i);
     }
 
     @Override

@@ -12,25 +12,29 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button2"
-        android:layout_above="@+id/button3"
-        android:layout_alignLeft="@+id/button3"
-        android:layout_alignStart="@+id/button3" />
+        android:text="Get Weapons Stats"
+        android:id="@+id/getWeaponStatsBtn"
+        android:layout_above="@+id/getMedalStatsBtn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="104dp"
+        android:onClick="getWeaponStats"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button3"
+        android:text="Get Medal Stats"
+        android:id="@+id/getMedalStatsBtn"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="getMedalStats"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button4"
-        android:layout_below="@+id/button3"
-        android:layout_centerHorizontal="true" />
+        android:text="Get Match Stats"
+        android:id="@+id/getMatchStatsBtn"
+        android:layout_marginBottom="99dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="getMatchStats"/>
 </RelativeLayout>

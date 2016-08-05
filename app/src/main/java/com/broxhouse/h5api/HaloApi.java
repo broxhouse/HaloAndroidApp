@@ -1,5 +1,7 @@
 package com.broxhouse.h5api;
 
+import android.util.Log;
+
 import com.broxhouse.h5api.models.metadata.*;
 import com.broxhouse.h5api.models.stats.common.MedalAward;
 import com.broxhouse.h5api.models.stats.common.WeaponStats;
@@ -19,13 +21,17 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.broxhouse.h5api.gameType.ARENA;
 import static com.broxhouse.h5api.gameType.CUSTOM;
@@ -113,35 +119,46 @@ public class HaloApi {
 
     private static String api(String url) throws Exception
     {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .header("Ocp-Apim-Subscription-Key", TOKEN)
+                .url(url)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        Log.i("api", response.body().toString());
+        Log.i("api", "hit the api method");
+        return response.body().toString();
 //        System.out.println(url);
-        HttpClient httpclient = HttpClients.createDefault();
-        String getResponse;
-
-        URIBuilder builder = new URIBuilder(url);
-
-
-        URI uri = builder.build();
-        HttpGet request = new HttpGet(uri);
-        request.setHeader("Ocp-Apim-Subscription-Key", TOKEN);
-
-
-        // Request body
-//            StringEntity reqEntity = new StringEntity("{body}");
-//            request.setEntity(reqEntity);
-
-        HttpResponse response = httpclient.execute(request);
-        HttpEntity entity = response.getEntity();
-
-        if (entity != null)
-        {
-            getResponse = EntityUtils.toString(entity);
-//                System.out.println(getResponse);
-            return getResponse;
-        }
-        else
-        {
-            return null;
-        }
+//        HttpClient httpclient = HttpClients.createDefault();
+//        String getResponse;
+//
+//        URIBuilder builder = new URIBuilder(url);
+//
+//
+//        URI uri = builder.build();
+//        HttpGet request = new HttpGet(uri);
+//        request.setHeader("Ocp-Apim-Subscription-Key", TOKEN);
+//
+//
+//        // Request body
+////            StringEntity reqEntity = new StringEntity("{body}");
+////            request.setEntity(reqEntity);
+//
+//        HttpResponse response = httpclient.execute(request);
+//        HttpEntity entity = response.getEntity();
+//
+//        if (entity != null)
+//        {
+//            getResponse = EntityUtils.toString(entity);
+////                System.out.println(getResponse);
+//            return getResponse;
+//        }
+//        else
+//        {
+//            return null;
+//        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -362,7 +379,6 @@ public class HaloApi {
         return obj;
     }
 
-    @Test
     public static void testMedalStats(Enum gameType) throws Exception
     {
         JSONArray obj = getPlayerStatsJSON(gameType).getJSONArray("MedalAwards");
