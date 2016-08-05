@@ -14,7 +14,7 @@ public class GetPlayerStats extends AppCompatActivity {
         setContentView(R.layout.activity_get_player_stats);
 
         Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        String message = intent.getStringExtra(MainActivity.TAG);
         TextView textView = new TextView(this);
         textView.setText(message);
         textView.setText(message);

@@ -14,7 +14,7 @@ public class Match {
     public static class Id {
         /**
          * The ID for this match. More match details are available via the applicable
-         * Post Game Carnage Report endpoint.
+         * Post Game Carnage Report endpoint. test
          */
         @SerializedName("MatchId")
         private String matchId;

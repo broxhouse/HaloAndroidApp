@@ -1,5 +1,12 @@
 <resources>
-    <string name="app_name">HaloAndroidApp</string>
-    <string name="edit_message">Enter your Gamertag</string>
+    <string name="app_name">Halo 5 Random Stats</string>
+    <string name="edit_message">Enter Your Gamertag</string>
     <string name="button_send">Go!</string>
+    <string name="home_button">Home</string>
+    <string name="gamer_tag">Gamertag</string>
+    <string name="title_activity_menu">Menu</string>
+    <string name="title_activity_test_menu">TestMenu</string>
+    <string name="menu_compare">Compare Players</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_medals">See Medals</string>
 </resources>

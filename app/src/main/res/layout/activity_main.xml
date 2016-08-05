@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
-    <EditText android:id="@+id/edit_message"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/edit_message" />
+    android:icon="@drawable/champion"
+    android:orientation="horizontal"
+    android:background="#ffffff">
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
-        android:onClick="sendGamertag"
-        />
-</LinearLayout>
+        android:id="@+id/mainButton"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/edit_message"
+        android:id="@+id/mainText"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="98dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Gamertag"
+        android:ems="10"
+        android:id="@+id/gtInputMain"
+        android:layout_below="@+id/mainText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp"
+        android:textAlignment="center"
+        android:visibility="visible" />
+
+</RelativeLayout>
