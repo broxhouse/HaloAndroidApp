@@ -2,6 +2,7 @@ package com.broxhouse.h5api;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.broxhouse.h5api.models.metadata.Medal;
@@ -12,22 +13,31 @@ import org.json.JSONArray;
 
 
 public class GetMedals extends AppCompatActivity {
+//
+//
+//    Handler handler = new Handler(){
+//        @Override
+//        public void handleMessage(Message msg) {
+//
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_medals);
 
+        Log.i("api", MedalsIntentService.dbHandler.getMedalDetails() + "testing DB access");
+
         GetMedals.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 TextView largeText = (TextView) findViewById(R.id.medalsLargeText);
                 try {
-                    largeText.setText(MainActivity.dbHandler.getMedalDetails());
+                    largeText.setText(testMedalStats(gameType.CUSTOM));
                 }catch (Exception e){}
             }
         });
-
     }
 
     public String testMedalStats(Enum gameType) throws Exception

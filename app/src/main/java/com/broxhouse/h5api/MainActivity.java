@@ -5,21 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.RelativeLayout;
-import android.graphics.Color;
-import android.content.res.Resources;
-import android.util.TypedValue;
 import android.util.Log;
 
-import com.broxhouse.h5api.models.metadata.Map;
-import com.broxhouse.h5api.models.metadata.Medal;
-import com.broxhouse.h5api.models.metadata.Weapon;
-
-import org.jdom.Content;
-import org.w3c.dom.Text;
+import okhttp3.Response;
 
 
 enum gameType {WARZONE, ARENA, CUSTOM}
@@ -29,38 +18,69 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "brocksMessage";
     public static String GAMERTAG = null;
     public static DBHandler dbHandler;
+    private static final String PLAYER_UF = "That Ax Guy";
+    private static final String TOKEN = "293bb4a86da743bdb983b97efa5bb265";
+    private static final String BASE_URL = "https://www.haloapi.com/";
+    private static final String STATS_URL = "https://www.haloapi.com/stats/h5/";
+    private static final String META_URL = "https://www.haloapi.com/metadata/h5/metadata/";
+    private static final String CUSTOM_STATS = STATS_URL + "servicerecords/custom?players=%s";
+    private static final String ARENA_STATS = STATS_URL + "servicerecords/arena?players=%s";
+    private static final String WARZONE_STATS = STATS_URL + "servicerecords/warzone?players=%s";
+    private static final String META_WEAPONS = META_URL + "weapons";
+    private static final String META_MEDALS = META_URL + "medals";
+    private static final String META_PLAYLISTS = META_URL + "playlists";
+    private static final String META_MAPS = META_URL + "maps";
+    private static final String META_MAP_VARIANTS = META_URL + "map-variants/%s";
+    private static final String POST_GAME_CARNAGE = BASE_URL + "stats/h5/arena/matches/%s";
+    private static String responseString = null;
+
+    Response response;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
 
+        setContentView(R.layout.activity_main);
+//        Intent intent = new Intent(this, MedalsIntentService.class);
+//        startService(intent);
+
+        Intent i = new Intent(this, WeaponService.class);
+        startService(i);
+
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.champion);
-        dbHandler  = new DBHandler(this, null, null, 1);
 
-        MainActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Medal[] medals = HaloApi.getMedals();
-                    for (int i = 0; i < medals.length; i++) {
-                        dbHandler.addMedal(medals[i]);
-                    }
-                    Weapon[] weapons = HaloApi.getWeapons();
-                    for (int i = 0; i < weapons.length; i++) {
-                        dbHandler.addWeapon(weapons[i]);
-                    }
-                    Map[] maps = HaloApi.getMaps();
-                    for (int i = 0; i < maps.length; i++) {
-                        dbHandler.addMap(maps[i]);
-                    }
-                } catch (Exception e) {
-                }
+//        dbHandler  = new DBHandler(this, null, null, 1);
+//
+//        MainActivity.this.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Medal[] medals = HaloApi.getMedals();
+//                    Log.i(TAG, "Getting Medals");
+//                    for (int i = 0; i < medals.length; i++) {
+//                        dbHandler.addMedal(medals[i]);
+//                    }
+//                    Weapon[] weapons = HaloApi.getWeapons();
+//                    Log.i(TAG, "Getting Weapons");
+//                    for (int i = 0; i < weapons.length; i++) {
+//                        dbHandler.addWeapon(weapons[i]);
+//                    }
+//                    Map[] maps = HaloApi.getMaps();
+//                    Log.i(TAG, "Getting Maps");
+//                    for (int i = 0; i < maps.length; i++) {
+//                        dbHandler.addMap(maps[i]);
+//                    }
+//                } catch (Exception e) {
+//                }
+//            }
+//        });
 
-                setContentView(R.layout.activity_main);
-            }
-        });
+
+
+
+
 
         //creating a button object that references the button we created in XML -- findViewById finds the widget by it's id
 //        Button mainButton = (Button) findViewById(R.id.mainButton);

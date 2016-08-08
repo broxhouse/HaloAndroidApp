@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
 import android.content.Context;
 import android.content.ContentValues;
+import android.util.Log;
 
 import com.broxhouse.h5api.models.metadata.Map;
 import com.broxhouse.h5api.models.metadata.Medal;
@@ -84,6 +85,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public void addMedal(Medal medal){
+        Log.i("database", "adding Medal" + medal.getName());
         ContentValues values = new ContentValues();
         values.put(COLUMN_MEDAL_NAME, medal.getName());
         values.put(COLUMN_MEDAL_ID, medal.getId());
@@ -94,9 +96,10 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public String getMedalDetails(){
+        Log.i("database", "getting DB details");
         String dbString = "";
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_MEDALS + " WHERE 1";
+        String query = "SELECT * FROM " + TABLE_MEDALS;
 
         //Cursor points to a location in your results
         Cursor c = db.rawQuery(query, null);
@@ -104,8 +107,9 @@ public class DBHandler extends SQLiteOpenHelper {
         c.moveToFirst();
 
         while (!c.isAfterLast()){
-            if(c.getString(c.getColumnIndex("medalname")) != null){
-                dbString += c.getString(c.getColumnIndex("medalname"));
+            if(c.getString(c.getColumnIndex(COLUMN_MEDAL_NAME)) != null){
+                Log.i("database", dbString + "iterating through db loop");
+                dbString += c.getString(c.getColumnIndex(COLUMN_MEDAL_NAME));
                 dbString += "\n";
             }
         }

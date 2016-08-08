@@ -1,5 +1,6 @@
 package com.broxhouse.h5api;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.broxhouse.h5api.models.metadata.*;
@@ -56,6 +57,7 @@ public class HaloApi {
     private static final String META_MAPS = META_URL + "maps";
     private static final String META_MAP_VARIANTS = META_URL + "map-variants/%s";
     private static final String POST_GAME_CARNAGE = BASE_URL + "stats/h5/arena/matches/%s";
+    private static String responseString = null;
 
     public static String formatString(String string)
     {
@@ -117,48 +119,30 @@ public class HaloApi {
         return api(String.format(META_MAP_VARIANTS, mapVariantID));
     }
 
-    private static String api(String url) throws Exception
+    private static String api(final String url) throws Exception
     {
-        OkHttpClient client = new OkHttpClient();
+        new AsyncTask<Void, Void, String>(){
+            @Override
+            protected String doInBackground(Void... params) {
+                OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .header("Ocp-Apim-Subscription-Key", TOKEN)
-                .url(url)
-                .build();
+                Request request = new Request.Builder()
+                        .header("Ocp-Apim-Subscription-Key", TOKEN)
+                        .url(url)
+                        .build();
 
-        Response response = client.newCall(request).execute();
-        Log.i("api", response.body().toString());
-        Log.i("api", "hit the api method");
-        return response.body().toString();
-//        System.out.println(url);
-//        HttpClient httpclient = HttpClients.createDefault();
-//        String getResponse;
-//
-//        URIBuilder builder = new URIBuilder(url);
-//
-//
-//        URI uri = builder.build();
-//        HttpGet request = new HttpGet(uri);
-//        request.setHeader("Ocp-Apim-Subscription-Key", TOKEN);
-//
-//
-//        // Request body
-////            StringEntity reqEntity = new StringEntity("{body}");
-////            request.setEntity(reqEntity);
-//
-//        HttpResponse response = httpclient.execute(request);
-//        HttpEntity entity = response.getEntity();
-//
-//        if (entity != null)
-//        {
-//            getResponse = EntityUtils.toString(entity);
-////                System.out.println(getResponse);
-//            return getResponse;
-//        }
-//        else
-//        {
-//            return null;
-//        }
+                try{
+                    Response response = client.newCall(request).execute();
+                    Log.i("api", response.body().string());
+                    Log.i("api", "hit the api method");
+                    responseString = response.body().string();
+                    return response.body().string();
+                }catch (Exception e){}
+
+                return null;
+            }
+        }.execute();
+        return responseString;
     }
 
     public static void main(String[] args) throws Exception {
@@ -208,6 +192,7 @@ public class HaloApi {
         Gson gson = new Gson();
         String medalData = listMedals();
         Medal[] medals = gson.fromJson(medalData, Medal[].class);
+        Log.i("test", "hit getMedals() method");
         return medals;
     }
 

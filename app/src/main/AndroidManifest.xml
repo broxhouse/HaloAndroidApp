@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.broxhouse.h5api">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/champion"
@@ -29,7 +30,13 @@
             android:label="@string/title_activity_test_menu"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".GetMatchStats" />
-        <activity android:name=".GetMedals"></activity>
+        <activity android:name=".GetMedals" />
+
+        <service android:name=".MedalsIntentService" />
+        <service
+            android:name=".WeaponService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
