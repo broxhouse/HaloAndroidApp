@@ -1,9 +1,17 @@
 package com.broxhouse.h5api;
 
+import android.app.Service;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Binder;
+import android.os.IBinder;
 import android.util.Log;
 
-import com.broxhouse.h5api.models.metadata.*;
+import com.broxhouse.h5api.models.metadata.Map;
+import com.broxhouse.h5api.models.metadata.MapVariant;
+import com.broxhouse.h5api.models.metadata.Medal;
+import com.broxhouse.h5api.models.metadata.Playlist;
+import com.broxhouse.h5api.models.metadata.Weapon;
 import com.broxhouse.h5api.models.stats.common.MedalAward;
 import com.broxhouse.h5api.models.stats.common.WeaponStats;
 import com.broxhouse.h5api.models.stats.matches.Match;
@@ -13,23 +21,16 @@ import com.broxhouse.h5api.models.stats.reports.SpartanRankedPlayerStats;
 import com.broxhouse.h5api.models.stats.servicerecords.ArenaStat;
 import com.broxhouse.h5api.models.stats.servicerecords.BaseServiceRecordResult;
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+
+import org.codehaus.groovy.tools.groovydoc.Main;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -38,10 +39,9 @@ import static com.broxhouse.h5api.gameType.ARENA;
 import static com.broxhouse.h5api.gameType.CUSTOM;
 import static com.broxhouse.h5api.gameType.WARZONE;
 
+public class DataService extends Service {
 
-public class HaloApi {
-
-    private static final String PLAYER_UF = "That Brock Guy";
+    private static final String PLAYER_UF = MainActivity.GAMERTAG;
     private static final String PLAYER = formatString(PLAYER_UF);
     private static final String TOKEN = "293bb4a86da743bdb983b97efa5bb265";
     private static final String BASE_URL = "https://www.haloapi.com/";
@@ -58,6 +58,16 @@ public class HaloApi {
     private static final String META_MAP_VARIANTS = META_URL + "map-variants/%s";
     private static final String POST_GAME_CARNAGE = BASE_URL + "stats/h5/arena/matches/%s";
     private static String responseString = null;
+    private static String TAG = "test";
+    private final IBinder binder = new MyLocalBinder();
+
+    public DataService() {
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
 
     public static String formatString(String string)
     {
@@ -70,7 +80,6 @@ public class HaloApi {
         return api(String.format(POST_GAME_CARNAGE, matchID));
     }
 
-    //https://www.haloapi.com/stats/h5/players/that%20brock%20guy/matches?modes=arena,custom&start=10&count=26
     public static String playerMatches(String gt, String modes, int start, int count) throws Exception {
         String pURL = PLAYER_MATCHES;
         pURL = pURL +"?modes=" + modes + "&";
@@ -96,7 +105,9 @@ public class HaloApi {
 
     public static String listMedals() throws Exception
     {
-        return api(META_MEDALS);
+        String medals = api(META_MEDALS);
+        Log.i(TAG, "listMedals() method");
+        return medals;
     }
 
     public static String listWeapons() throws Exception
@@ -145,25 +156,6 @@ public class HaloApi {
         return responseString;
     }
 
-    public static void main(String[] args) throws Exception {
-        try
-        {
-//            testJSONWeapons();
-//            testJSONMedals();
-//            testMedalStats(CUSTOM);
-//            testWeaponKills(CUSTOM);
-            testPlayerMatches();
-//            totalGames();
-//            testPlayerStats();
-//            testBaseStats(ARENA);
-//            testBaseResults();
-//            testActivePlaylists();
-//            comparePlayers("That Trev Guy", "That Ax Guy");
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
 
     public static void testJSONWeapons() throws Exception
     {
@@ -354,7 +346,6 @@ public class HaloApi {
         }
         if (gameType == ARENA)
         {
-            Log.i("test", "Getting Arena Stats:");
             obj = new JSONObject(arenaStats(gt)).getJSONArray("Results").getJSONObject(0).getJSONObject("Result").getJSONObject("ArenaStats");
         }
         if (gameType == CUSTOM)
@@ -365,43 +356,47 @@ public class HaloApi {
         return obj;
     }
 
-    public static void testMedalStats(Enum gameType) throws Exception
+    public static String testMedalStats(Enum gameType) throws Exception
     {
-        JSONArray obj = getPlayerStatsJSON(gameType).getJSONArray("MedalAwards");
+        Log.i(TAG, "testing medal stats");
+        JSONArray obj = HaloApi.getPlayerStatsJSON(gameType).getJSONArray("MedalAwards");
+        String medalStats = "test";
         String mostEarnedMedal = null;
         double average = 0;
         int highestMedalCount = 0;
         String var = obj.toString();
         System.out.println(var);
-        double games = totalGames(gameType, PLAYER);
+        Log.i(TAG, "getting total games");
+        double games = HaloApi.totalGames(gameType, MainActivity.GAMERTAG);
         games = (double)Math.round(games *1000d) / 1000d;
         Gson gson = new Gson();
-        Medal[] medals = getMedals();
+        Medal[] medals = HaloApi.getMedals();
         MedalAward[] stats = gson.fromJson(var, MedalAward[].class);
         for (int row = 0; row < stats.length; row++)
         {
-            stats[row].setName(getMedalName(stats[row].getMedalId(), medals));
+            stats[row].setName(HaloApi.getMedalName(stats[row].getMedalId(), medals));
         }
-        System.out.println("Showing medal stats for " + PLAYER_UF);
-        for (int row = 0; row < stats.length; row++)
-        {
-            double medalCount = stats[row].getCount()/games;
-            medalCount = (double)Math.round(medalCount *1000d) / 1000d;
-            System.out.println(stats[row].getName() + ": " + stats[row].getCount() + " ||  Earned per game: " + medalCount);
-        }
-        for (int i = 0; i < stats.length; i++)
-        {
-            for (int k = i + 1; k < stats.length; k++)
-            {
-                if (stats[i].getCount() > stats[k].getCount() && stats[i].getCount() > highestMedalCount) {
-                    highestMedalCount = stats[i].getCount();
-                    mostEarnedMedal = stats[i].getName();
-                }
-            }
-        }
-        average = highestMedalCount / games;
-        average = (double)Math.round(average *1000d) / 1000d;
-        System.out.println("Your most earned medal is the " + mostEarnedMedal + " medal with a total of " + highestMedalCount + " and an average of " + average + " per game");
+        medalStats+= ("\nShowing medal stats for " + MainActivity.GAMERTAG);
+//        for (int row = 0; row < stats.length; row++)
+//        {
+//            double medalCount = stats[row].getCount()/games;
+//            medalCount = (double)Math.round(medalCount *1000d) / 1000d;
+//            medalStats+= ("\n" + stats[row].getName() + ": " + stats[row].getCount() + " ||  Earned per game: " + medalCount);
+//        }
+//        for (int i = 0; i < stats.length; i++)
+//        {
+//            for (int k = i + 1; k < stats.length; k++)
+//            {
+//                if (stats[i].getCount() > stats[k].getCount() && stats[i].getCount() > highestMedalCount) {
+//                    highestMedalCount = stats[i].getCount();
+//                    mostEarnedMedal = stats[i].getName();
+//                }
+//            }
+//        }
+//        average = highestMedalCount / games;
+//        average = (double)Math.round(average *1000d) / 1000d;
+//        medalStats+= ("\nYour most earned medal is the " + mostEarnedMedal + " medal with a total of " + highestMedalCount + " and an average of " + average + " per game");
+        return medalStats;
     }
 
     public static void testPlayerStats() throws Exception
@@ -709,4 +704,13 @@ public class HaloApi {
         }
     }
 
+    public static String testString() {
+        return "[{\"name\":\"Urban\",\"description\":\"Andesia was the crucible for countless heroes and villains caught in the throes of seething rebellion and righteous excess.\",\"supportedGameModes\":[\"Warzone\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/warzone/warzone_maps_array08-b2c5175d0e8446c29e4fc6888492e5ff.jpg\",\"id\":\"c93d708f-f206-11e4-a815-24be05e24f7e\",\"contentId\":\"c93d708f-f206-11e4-a815-24be05e24f7e\"},{\"name\":\"Raid on Apex 7\",\"description\":\"This unbroken ring is a symbol of the discovery that shook the galaxy and changed the course of both human and Covenant destiny.\",\"supportedGameModes\":[\"Warzone\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/warzone/apex-04a7ffdd6aca4e48bc159ae754ca6585.jpg\",\"id\":\"cb251c51-f206-11e4-8541-24be05e24f7e\",\"contentId\":\"cb251c51-f206-11e4-8541-24be05e24f7e\"},{\"name\":\"March on Stormbreak\",\"description\":null,\"supportedGameModes\":[\"Warzone\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/warzone/stormbreak-cbacd64e24bb432db9cf30ac66602284.jpg\",\"id\":\"c854e54f-f206-11e4-bddc-24be05e24f7e\",\"contentId\":\"c854e54f-f206-11e4-bddc-24be05e24f7e\"},{\"name\":\"Escape from A.R.C.\",\"description\":\"Scientists flocked to this Forerunner excavation in search of new beginnings. What they unearthed will lead to their inevitable end.\",\"supportedGameModes\":[\"Warzone\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/warzone/arc-f3f60a132fa746899ce9c2d340152ddb.jpg\",\"id\":\"c8d69870-f206-11e4-b477-24be05e24f7e\",\"contentId\":\"c8d69870-f206-11e4-b477-24be05e24f7e\"},{\"name\":\"Osiris\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array01-9c1ff3f00e364bfaa0e059a90fa37d92.jpg\",\"id\":\"73ed1fd0-45e5-4bb9-ab6a-d2852c04ea7d\",\"contentId\":\"73ed1fd0-45e5-4bb9-ab6a-d2852c04ea7d\"},{\"name\":\"Blue Team\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array02-b6e6f433fbbf4011856722afba3cba67.jpg\",\"id\":\"96c3e3dd-7703-4086-9e64-e3a23932bdc4\",\"contentId\":\"96c3e3dd-7703-4086-9e64-e3a23932bdc4\"},{\"name\":\"Glassed\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array03-56e025da746b4a7cb0662d3412fbcb1f.jpg\",\"id\":\"1c4f8e19-b046-4f78-9e2d-959cba84663d\",\"contentId\":\"1c4f8e19-b046-4f78-9e2d-959cba84663d\"},{\"name\":\"Unconfirmed\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array05-4fda17114e954fc293dbc788a3771917.jpg\",\"id\":\"825065cf-df57-42e3-b845-830e7340ea43\",\"contentId\":\"825065cf-df57-42e3-b845-830e7340ea43\"},{\"name\":\"Alliance\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array09-a9daf8297db04798b071c7061b12b4b8.jpg\",\"id\":\"9a188f67-1664-4d7b-83ca-1d74f714f764\",\"contentId\":\"9a188f67-1664-4d7b-83ca-1d74f714f764\"},{\"name\":\"Before the Storm\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array11-f715334a2a68435fba6dc7467f561c50.jpg\",\"id\":\"2702ea83-2c3e-4fd5-8370-60d9a6e0422f\",\"contentId\":\"2702ea83-2c3e-4fd5-8370-60d9a6e0422f\"},{\"name\":\"Genesis\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.com/media/Default/games/halo-5-guardians/map-images/campaign/campaign_missions_array13-c60a8c104a4e4f409c8d275a570730a4.jpg\",\"id\":\"82f8471c-a2ef-4089-ac04-7e829fdec912\",\"contentId\":\"82f8471c-a2ef-4089-ac04-7e829fdec912\"},{\"name\":\"The Breaking\",\"description\":null,\"supportedGameModes\":[\"Campaign\"],\"imageUrl\":\"https://content.halocdn.";
+    }
+
+    public class MyLocalBinder extends Binder {
+        DataService getService(){
+            return DataService.this;
+        }
+    }
 }

@@ -1,12 +1,18 @@
 package com.broxhouse.h5api;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.util.Log;
+import com.broxhouse.h5api.DataService.MyLocalBinder;
 
 import okhttp3.Response;
 
@@ -18,23 +24,27 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "brocksMessage";
     public static String GAMERTAG = null;
     public static DBHandler dbHandler;
-    private static final String PLAYER_UF = "That Ax Guy";
-    private static final String TOKEN = "293bb4a86da743bdb983b97efa5bb265";
-    private static final String BASE_URL = "https://www.haloapi.com/";
-    private static final String STATS_URL = "https://www.haloapi.com/stats/h5/";
-    private static final String META_URL = "https://www.haloapi.com/metadata/h5/metadata/";
-    private static final String CUSTOM_STATS = STATS_URL + "servicerecords/custom?players=%s";
-    private static final String ARENA_STATS = STATS_URL + "servicerecords/arena?players=%s";
-    private static final String WARZONE_STATS = STATS_URL + "servicerecords/warzone?players=%s";
-    private static final String META_WEAPONS = META_URL + "weapons";
-    private static final String META_MEDALS = META_URL + "medals";
-    private static final String META_PLAYLISTS = META_URL + "playlists";
-    private static final String META_MAPS = META_URL + "maps";
-    private static final String META_MAP_VARIANTS = META_URL + "map-variants/%s";
-    private static final String POST_GAME_CARNAGE = BASE_URL + "stats/h5/arena/matches/%s";
-    private static String responseString = null;
 
-    Response response;
+//    DataService brockService;
+//    boolean isBound = false;
+
+//    private static final String PLAYER_UF = "That Ax Guy";
+//    private static final String TOKEN = "293bb4a86da743bdb983b97efa5bb265";
+//    private static final String BASE_URL = "https://www.haloapi.com/";
+//    private static final String STATS_URL = "https://www.haloapi.com/stats/h5/";
+//    private static final String META_URL = "https://www.haloapi.com/metadata/h5/metadata/";
+//    private static final String CUSTOM_STATS = STATS_URL + "servicerecords/custom?players=%s";
+//    private static final String ARENA_STATS = STATS_URL + "servicerecords/arena?players=%s";
+//    private static final String WARZONE_STATS = STATS_URL + "servicerecords/warzone?players=%s";
+//    private static final String META_WEAPONS = META_URL + "weapons";
+//    private static final String META_MEDALS = META_URL + "medals";
+//    private static final String META_PLAYLISTS = META_URL + "playlists";
+//    private static final String META_MAPS = META_URL + "maps";
+//    private static final String META_MAP_VARIANTS = META_URL + "map-variants/%s";
+//    private static final String POST_GAME_CARNAGE = BASE_URL + "stats/h5/arena/matches/%s";
+//    private static String responseString = null;
+
+//    Response response;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -42,11 +52,13 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate");
 
         setContentView(R.layout.activity_main);
-//        Intent intent = new Intent(this, MedalsIntentService.class);
-//        startService(intent);
+//        Intent i = new Intent(this, DataService.class);
+//        bindService(i, connection, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent(this, MedalsIntentService.class);
+        startService(intent);
 
-        Intent i = new Intent(this, WeaponService.class);
-        startService(i);
+//        Intent i = new Intent(this, WeaponService.class);
+//        startService(i);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.champion);
@@ -217,4 +229,18 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         Log.i(TAG, "onRestoreInstanceState");
     }
+
+//    private ServiceConnection connection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            MyLocalBinder binder = (MyLocalBinder) service;
+//            brockService = binder.getService();
+//            isBound = true;
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            isBound = false;
+//        }
+//    };
 }
